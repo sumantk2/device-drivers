@@ -1,0 +1,11 @@
+BASIC WORKING CASE:
+
+whenever we do ifconfig up / whenever we create a socket connection : 
+network device driver will execute ndo_start_xmit function pointer (struct netdevice_ops)
+ndo_start_xmit is ideally called by the network stack and sk_buff which is created
+by network stack is passed as an argument to pci_map_single(). 
+After that device will generate a transmission interrupt ( normally we check
+the interrupt status register of PCI network card to get the status like TxOK /
+TxErr etc. In this case we do pci_unmap_single() after the dma transfer is done
+to the device and increment the count and no of bytes that has been transmitted
+
