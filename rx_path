@@ -1,0 +1,21 @@
+BASIC RECEIVE PATH:
+
+Well we get a packet received. Ideally we would like to hit the CPU .
+But this would hog the CPU. So can be done ?
+
+1) use a polling method.
+
+How can this be achieved ?
+- Before that we need to know about napi
+  - napi_schedule() - whenever we get a interrupt, disable the Interrupt status 
+    register Rx field and then enable it after napi_complete()  ??. A little later.
+  - netif_napi_add(function pointer for rx poll)
+  - napi_complete() - when we are done with polling mode. This changes the state field.
+
+Check the interrupt status register if we have received any Rx. 
+   - set the state and schedule it using napi_schedule(). Disable the Rx interupt.
+     Now softirq will execute rx poll function ( passed as an arguement to netif_napi_add )
+   - polling is done until maximum budget:16 ( it can exist before that as well). 
+     Then we change the state field and enable the rx interrupt after napi_complete.
+     Now we are in interrupt mode again !!! 
+     
